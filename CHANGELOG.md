@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-11-08
+
 ### Added
 - Raw key mode: `Database(path:rawKey:)` and `rekey(rawKey:)` take a 32-byte key and apply it as SQLCipher's `x'…'` literal, skipping PBKDF2. Either kind of key can replace either kind on rekey.
 - Unencrypted databases: `Database(unencryptedPath:)` manages a plain SQLite file through the same API. `isEncrypted` reports which kind a `Database` holds; `rekey` throws `SqlCipherError.notEncrypted` on an unencrypted database.
