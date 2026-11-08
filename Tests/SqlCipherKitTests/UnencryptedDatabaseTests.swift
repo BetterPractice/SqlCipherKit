@@ -48,11 +48,11 @@ struct UnencryptedDatabaseTests {
             let db = try Database(path: path, key: "secret")
             try await db.execute("CREATE TABLE t (v INTEGER)")
         }
-        #expect {
+        await expectSqlCipherError("notPlaintextDatabase") {
             _ = try Database(unencryptedPath: path)
-        } throws: { error in
-            guard case SqlCipherError.notPlaintextDatabase = error else { return false }
-            return true
+        } matching: { error in
+            if case .notPlaintextDatabase = error { return true }
+            return false
         }
     }
 
@@ -72,11 +72,11 @@ struct UnencryptedDatabaseTests {
     @Test("Rekey is unavailable")
     func rekeyThrows() async throws {
         let db = try Database(unencryptedPath: tempDBPath())
-        await #expect {
+        await expectSqlCipherError("notEncrypted") {
             try await db.rekey("secret")
-        } throws: { error in
-            guard case SqlCipherError.notEncrypted = error else { return false }
-            return true
+        } matching: { error in
+            if case .notEncrypted = error { return true }
+            return false
         }
         await #expect(throws: SqlCipherError.self) {
             try await db.rekey(rawKey: Data(repeating: 1, count: 32))

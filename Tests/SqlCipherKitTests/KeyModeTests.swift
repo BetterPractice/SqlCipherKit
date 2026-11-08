@@ -73,25 +73,25 @@ struct KeyModeTests {
     }
 
     @Test("Rejects a raw key of the wrong length before touching the file", arguments: [0, 16, 31, 33, 64])
-    func rejectsWrongLength(length: Int) throws {
+    func rejectsWrongLength(length: Int) async {
         let path = tempDBPath()
-        #expect {
+        await expectSqlCipherError("invalidKey") {
             _ = try Database(path: path, rawKey: Data(repeating: 7, count: length))
-        } throws: { error in
-            guard case SqlCipherError.invalidKey = error else { return false }
-            return true
+        } matching: { error in
+            if case .invalidKey = error { return true }
+            return false
         }
         #expect(!FileManager.default.fileExists(atPath: path))
     }
 
     @Test("Rejects an empty passphrase before touching the file")
-    func rejectsEmptyPassphrase() throws {
+    func rejectsEmptyPassphrase() async {
         let path = tempDBPath()
-        #expect {
+        await expectSqlCipherError("invalidKey") {
             _ = try Database(path: path, key: "")
-        } throws: { error in
-            guard case SqlCipherError.invalidKey = error else { return false }
-            return true
+        } matching: { error in
+            if case .invalidKey = error { return true }
+            return false
         }
         #expect(!FileManager.default.fileExists(atPath: path))
     }
