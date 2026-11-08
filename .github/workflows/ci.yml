@@ -1,10 +1,14 @@
 name: CI
 
 on:
-  pull_request:
-    branches: ["*"]
+  # Every branch push runs CI, so a commit is verified before main is
+  # fast-forwarded to it (main's ruleset requires these checks to pass).
   push:
-    branches: [main]
+    branches: ["**"]
+  # Pull requests from forks don't push to this repository, so they still
+  # need their own trigger.
+  pull_request:
+    branches: ["**"]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
