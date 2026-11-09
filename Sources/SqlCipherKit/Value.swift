@@ -136,12 +136,15 @@ extension Data: SQLConvertible {
 ///   A `.none` return from `from(sqlValue:)` indicates a parsing failure,
 ///   not a SQL NULL — that distinction matters for generic code that checks
 ///   whether decoding succeeded.
+///
+/// `Value` is module-qualified here because SwiftUI, imported elsewhere in
+/// this module, gives `Optional` a `Value` typealias of its own.
 extension Optional: SQLConvertible where Wrapped: SQLConvertible {
-    public var sqlValue: Value { self?.sqlValue ?? .null }
+    public var sqlValue: SqlCipherKit.Value { self?.sqlValue ?? .null }
 
     /// Returns `.some(.none)` for SQL NULL, `.some(.some(value))` on success,
     /// or `.none` when the value is present but cannot be parsed as `Wrapped`.
-    public static func from(sqlValue: Value) -> Self? {
+    public static func from(sqlValue: SqlCipherKit.Value) -> Self? {
         if case .null = sqlValue { return .some(.none) }
         return Wrapped.from(sqlValue: sqlValue).map { .some($0) }
     }

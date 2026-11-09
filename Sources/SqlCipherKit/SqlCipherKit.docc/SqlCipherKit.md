@@ -13,6 +13,7 @@ Key capabilities:
 - **`Entity` persistence.** Conform your `Codable` models to ``Entity`` and get automatic INSERT, UPDATE, DELETE, and SELECT helpers with zero boilerplate, usable on their own or together inside ``Database/transaction(_:)``.
 - **Composable query builders.** Construct type-safe `SELECT`, `UPDATE`, `INSERT`, `CREATE TABLE`, and schema-alteration statements programmatically.
 - **Migrations.** Drive schema evolution with the ``Migration`` protocol and ``MigrationContext``.
+- **Live queries.** Follow an entity fetch or an aggregate as the database changes, through ``Database/values(of:)`` on any platform or the ``Live`` property wrapper in SwiftUI.
 - **No external dependencies on Apple platforms.** Uses CommonCrypto (bundled with the OS) as the SQLCipher crypto backend.
 
 ## Topics
@@ -43,6 +44,15 @@ Key capabilities:
 - ``DropTableBuilder``
 - ``CreateIndexBuilder``
 - ``DropIndexBuilder``
+
+### Live Queries
+
+- ``LiveRequest``
+- ``LiveValues``
+- ``SortTerm``
+- ``Live``
+- ``LivePhase``
+- ``LiveError``
 
 ### Configuration
 

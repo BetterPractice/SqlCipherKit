@@ -74,9 +74,7 @@ jobs:
       fail-fast: false
       matrix:
         swift:
-          - "6.0"   # Oldest supported: matches swift-tools-version in Package.swift
-          - "6.1"
-          - "6.2"
+          - "6.2"   # Oldest supported: matches swift-tools-version in Package.swift
     container:
       image: swift:${{ matrix.swift }}
     steps:

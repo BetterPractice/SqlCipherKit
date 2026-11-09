@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Live queries. A `LiveRequest` describes an entity fetch (`.fetch`, `.fetchOne`) or a scalar aggregate (`.count`, `.exists`, `.sum`, `.min`, `.max`, `.avg`, `.total`) to observe. Requests with the same SQL and bindings are equal.
+- `Database.values(of:)`: an `AsyncSequence` that yields a request's current value and then each change. It is pull-based, skips changes that leave the result the same, and works on Linux.
+- `@Live` SwiftUI property wrapper (iOS 14+, macOS 11+, visionOS), reading the database from `EnvironmentValues.database`. Supports an `animation:` parameter, and reports loading and errors through `$property.phase` (`LivePhase`) with `$property.retry()`. A missing database is reported as `LiveError.missingDatabase`.
+- `SortTerm`, with `ColumnRef.ascending` and `.descending`, for ordering live fetches.
+
+### Changed
+- Swift 6.2 (Xcode 26) or later is required. Earlier toolchains are no longer supported.
+- Every `Database` now records which tables each statement writes, using a SQLite authorizer, so that live queries can be notified. This adds a small cost to compiling a statement (paid once per cached SQL string) and to finishing one, whether or not anything is observed.
+
 ## [0.10.0] - 2026-11-08
 
 ### Added

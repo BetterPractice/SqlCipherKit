@@ -15,6 +15,8 @@ On Apple platforms (**macOS 10.15+, iOS 13+, visionOS 1+**) the library uses App
 | visionOS | 1 | CommonCrypto | None |
 | Linux | — | OpenSSL | `libssl-dev` / `openssl-devel` |
 
+Building requires Swift 6.2 or later (Xcode 26 on Apple platforms).
+
 ---
 
 ## Installation
@@ -206,6 +208,95 @@ let order = try await db.transaction { conn in
 ```
 
 Use `conn.savepoint { ... }` inside a transaction for a step that can fail and be undone without abandoning the rest. A batch `save([...])` already uses a savepoint, so it nests safely inside a transaction.
+
+---
+
+## Live Queries
+
+A live query holds the result of a request and updates whenever a change to the database alters it. Describe what to observe with a `LiveRequest`:
+
+| Request | Result | Before the first fetch |
+|---|---|---|
+| `.fetch(T.self, where:orderBy:limit:)` | `[T]` | `[]` |
+| `.fetchOne(T.self, id:)` | `T?` | `nil` |
+| `.count(T.self, where:)` | `Int` | `0` |
+| `.exists(T.self, where:)` | `Bool` | `false` |
+| `.sum`, `.min`, `.max` `(T.self, column, as:where:)` | `V?` | `nil` |
+| `.avg(T.self, column, where:)` | `Double?` | `nil` |
+| `.total(T.self, column, where:)` | `Double` | `0` |
+
+`sum`, `min`, `max`, and `avg` are `nil` when no rows match, as in SQL. Use `total` when no rows should read as zero.
+
+### In SwiftUI
+
+`@Live` is available on iOS 14+, macOS 11+, and visionOS. Set the database once in the environment, then declare the result as a property:
+
+```swift
+@main
+struct ShopApp: App {
+    let db = try! Database(path: storePath, key: passphrase)
+
+    var body: some Scene {
+        WindowGroup {
+            ProductList(maxPrice: 50).environment(\.database, db)
+        }
+    }
+}
+
+struct ProductList: View {
+    @Live var products: [Product]
+    @Live var count: Int
+
+    init(maxPrice: Double) {
+        _products = Live(
+            .fetch(Product.self, where: col("price") < maxPrice, orderBy: col("name").ascending),
+            animation: .default)
+        _count = Live(.count(Product.self))
+    }
+
+    var body: some View {
+        List(products, id: \.id) { Text($0.name) }
+            .navigationTitle("\(count) products")
+    }
+}
+```
+
+- **Parameters.** When the view is re-created with a different request, for example a new `maxPrice`, the query runs again. Re-creating it with an equal request leaves the running observation alone, so creating a `Live` in `init` is cheap.
+- **Placeholder first.** The property holds the request's placeholder until the first fetch completes.
+- **Animation.** When `animation` is set, changes after the first value are applied with it. The first value is never animated.
+- **Database changes.** If the environment's database changes, for example on sign-out, the property shows the placeholder until the new database delivers. It never shows the previous database's rows.
+
+The projected value reports loading and errors. A missing `\.database` is reported as `LiveError.missingDatabase`, and a fetch that fails (for example because a table does not exist yet) stops observation until `retry()` is called:
+
+```swift
+if let error = $products.phase.error {
+    Text("Couldn't load products: \(String(describing: error))")
+    Button("Retry") { $products.retry() }
+} else if $products.phase.isLoading {
+    ProgressView()
+}
+```
+
+### As an async sequence
+
+On every platform, including Linux, `values(of:)` returns an `AsyncSequence` that yields the current value and then each change:
+
+```swift
+for try await products in db.values(of: .fetch(Product.self, orderBy: col("name").ascending)) {
+    try await socket.send(JSONEncoder().encode(products))
+}
+```
+
+The sequence is pull-based: commits only mark it dirty, and the query runs when the loop asks for the next value. A slow consumer receives the current state rather than a backlog. The query runs on the database actor and only the result is sent to the loop. The sequence ends when its task is cancelled, and throws if a fetch fails.
+
+### How changes are detected
+
+Every statement is checked when it is compiled for the tables it can write, including writes made by triggers and foreign-key cascades. When a transaction ends, observers of the tables it changed fetch again. A transaction produces one value. A write that leaves an observer's rows unchanged, such as an update to a row outside its `where` clause, produces none.
+
+Limitations:
+
+- **Only this `Database`'s writes are seen.** Changes made by another process (an app extension or widget, for example) or another connection to the same file are not detected.
+- **Transactions left open across calls.** `transaction(_:)`, `savepoint(_:)`, batch `save([...])`, and migrations run as one call on the actor, so an observer never fetches while they are in progress. A transaction managed by hand with separate `execute("BEGIN")` and `execute("COMMIT")` calls is different: an observer may fetch between those calls and show uncommitted rows. It fetches again when the transaction ends, so a rollback is corrected. Use the transaction methods to avoid this.
 
 ---
 

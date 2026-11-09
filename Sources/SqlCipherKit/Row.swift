@@ -23,6 +23,9 @@ public struct Row: Sendable {
         self.values = values
     }
 
+    /// The ordered column values, for comparing result sets.
+    var rawValues: [Value] { values }
+
     // MARK: - Public interface
 
     /// The number of columns in this row.

@@ -83,6 +83,12 @@ public actor Database {
     /// is only ever accessed from within the actor's executor.
     private nonisolated(unsafe) let statementCache: StatementCache
 
+    /// Live observers registered through ``values(of:)``.
+    ///
+    /// `nonisolated(unsafe)` for the same reason as `handle`; the change
+    /// tracker notifies it from statements running on the actor's executor.
+    nonisolated(unsafe) let observers: ObserverRegistry
+
     // MARK: - Entity configuration
 
     /// Strategy used to encode and decode complex Swift properties —
@@ -282,11 +288,17 @@ public actor Database {
         self.complexColumnStrategy = complexColumnStrategy
         self.isEncrypted = keyMaterial.isEncrypted
         self.journalMode = mode
+        let tracker = ChangeTracker(db: opened)
+        let observers = ObserverRegistry()
+        tracker.onTransactionEnd = { [observers] tables in observers.notify(tables) }
+
         self.handle = opened
-        self.statementCache = StatementCache(db: opened)
+        self.statementCache = StatementCache(db: opened, tracker: tracker)
+        self.observers = observers
     }
 
     deinit {
+        statementCache.tracker.detach()
         sqlite3_close_v2(handle)
     }
 
