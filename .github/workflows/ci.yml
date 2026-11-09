@@ -60,6 +60,7 @@ jobs:
         run: |
           BIN_DIR="$(swift build --show-bin-path)"
           BUNDLE="$(find "$BIN_DIR" -maxdepth 1 -name '*.xctest' | head -n 1)"
+          [ -n "$BUNDLE" ] || { echo "No .xctest bundle in $BIN_DIR"; ls "$BIN_DIR"; exit 1; }
           PROFDATA="$(dirname "$(swift test --show-codecov-path)")/default.profdata"
           xcrun llvm-cov report \
             "$BUNDLE/Contents/MacOS/$(basename "$BUNDLE" .xctest)" \
@@ -96,14 +97,17 @@ jobs:
       - name: Build and test
         run: swift test --configuration debug --enable-code-coverage
 
-      # See the macOS coverage step.  On Linux the bundle is the executable.
+      # See the macOS coverage step.  Before Swift 6.4 the tests build to an
+      # executable `.xctest`; from 6.4 to a `<Target>.so` loaded by a separate
+      # test runner.  Either one holds the coverage mapping.
       - name: Coverage report
         run: |
           BIN_DIR="$(swift build --show-bin-path)"
-          BUNDLE="$(find "$BIN_DIR" -maxdepth 1 -name '*.xctest' | head -n 1)"
+          TESTS="$(find "$BIN_DIR" -maxdepth 1 \( -name '*.xctest' -o -name '*Tests.so' \) | head -n 1)"
+          [ -n "$TESTS" ] || { echo "No test binary in $BIN_DIR"; ls "$BIN_DIR"; exit 1; }
           PROFDATA="$(dirname "$(swift test --show-codecov-path)")/default.profdata"
           llvm-cov report \
-            "$BUNDLE" \
+            "$TESTS" \
             -instr-profile "$PROFDATA" \
             --ignore-filename-regex=".build|CSqlCipher" \
             --summary-only
