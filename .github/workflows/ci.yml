@@ -68,13 +68,15 @@ jobs:
             --ignore-filename-regex=".build|CSqlCipher" \
             --summary-only
 
+      # pipefail makes the step fail when xcodebuild does, not just xcpretty.
       - name: Build for iOS (deployment target check)
         run: |
+          set -o pipefail
           xcodebuild build \
             -scheme SqlCipherKit \
             -destination 'generic/platform=iOS' \
             SWIFT_STRICT_CONCURRENCY=complete \
-            | xcpretty || true
+            | xcpretty
 
   # ── Linux ──────────────────────────────────────────────────────────────────
   test-linux:
