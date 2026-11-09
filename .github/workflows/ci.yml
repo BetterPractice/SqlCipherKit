@@ -34,13 +34,16 @@ jobs:
 
   # ── macOS ──────────────────────────────────────────────────────────────────
   test-macos:
-    name: Test · macOS (${{ matrix.xcode }})
-    runs-on: macos-26
+    name: Test · macOS (Xcode ${{ matrix.xcode }})
+    runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
-        xcode:
-          - "26.0"   # Swift 6.2
+        include:
+          - runner: macos-26
+            xcode: "26.0"   # Swift 6.2: oldest supported
+          - runner: xcode-27  # macOS 27 image (public preview)
+            xcode: "27.1"   # Swift 6.4
     steps:
       - uses: actions/checkout@v6
 
@@ -75,6 +78,7 @@ jobs:
       matrix:
         swift:
           - "6.2"   # Oldest supported: matches swift-tools-version in Package.swift
+          - "6.4"   # Newest release
     container:
       image: swift:${{ matrix.swift }}
     steps:
