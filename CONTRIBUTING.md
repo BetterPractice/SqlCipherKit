@@ -21,9 +21,8 @@ For **security vulnerabilities**, please follow the process described in [SECURI
    ```bash
    swift test
    ```
-4. **Run the linter** to catch style issues early:
+4. **Check formatting** with [SwiftFormat](https://github.com/nicklockwood/SwiftFormat), using the version pinned in `.github/workflows/ci.yml`. Run `swiftformat .` to apply the fixes it reports:
    ```bash
-   swiftlint lint
    swiftformat --lint .
    ```
 5. **Update the changelog** — add an entry under `[Unreleased]` in `CHANGELOG.md` describing your change.
@@ -31,7 +30,7 @@ For **security vulnerabilities**, please follow the process described in [SECURI
 
 ## Code Style
 
-- The project uses **SwiftLint** and **SwiftFormat**; both run automatically in CI. See `.swiftlint.yml` and `.swiftformat` for the configured rules.
+- The project uses **SwiftFormat**, which runs automatically in CI. See `.swiftformat` for the configured rules.
 - Prefer small, focused PRs. Large refactors should be discussed in an issue first.
 - All public symbols require documentation comments (`///`).
 

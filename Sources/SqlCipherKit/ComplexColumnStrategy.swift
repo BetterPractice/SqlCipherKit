@@ -81,7 +81,7 @@ public struct ComplexColumnStrategy: Sendable {
                         .init(
                             codingPath: [],
                             debugDescription:
-                                "ComplexColumnStrategy.json expected a TEXT column, got \(sqlValue)."
+                            "ComplexColumnStrategy.json expected a TEXT column, got \(sqlValue)."
                         ))
                 }
                 return try decoder.decode(type, from: data)
@@ -117,7 +117,7 @@ public struct ComplexColumnStrategy: Sendable {
                 .init(
                     codingPath: [],
                     debugDescription:
-                        "ComplexColumnStrategy.decode returned an unexpected type for \(T.self)."))
+                    "ComplexColumnStrategy.decode returned an unexpected type for \(T.self)."))
         }
         return typed
     }

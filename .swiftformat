@@ -1,42 +1,48 @@
---swiftversion 6.0
+--swift-version 6.2
+--language-mode 6
 --exclude .build, Sources/CSqlCipher
 
 # Indentation
 --indent 4
---tabwidth 4
---smarttabs enabled
---indentcase false
+--tab-width 4
+--smart-tabs enabled
+--indent-case false
+--ifdef no-indent
+--indent-strings true
 
 # Line endings / whitespace
---trimwhitespace always
+--trim-whitespace always
 --linebreaks lf
---maxwidth none
+--max-width none
 
-# Blank lines
---insertlines enabled
---removelines enabled
---emptybraces no-space
---linebreakbeforebraces false
+# Braces
+--empty-braces no-space
 --allman false
 
 # Imports
---importgrouping testable-bottom
+--import-grouping testable-last
 
-# Closures / trailing syntax
---trailingclosures enabled
---stripunusedargs closure-only
-
-# Semicolons / redundant syntax
+# Closures / redundant syntax
+--strip-unused-args closure-only
 --semicolons never
---redundanttype inferred
---redundantbackticks remove
---redundantnil remove
---redundantlet remove
---redundantvoidreturntype closure
+--property-types inferred
 
 # self
 --self remove
---selfrequired
 
 # Disabled rules — avoid conflicts with test code and Sendable conformances
 --disable noForceUnwrapInTests,noForceTryInTests,redundantSendable
+
+# Disabled rules — house style.  Rules SwiftFormat enables by default that the
+# codebase does not follow.  Enable one by deleting it here and running
+# `swiftformat .` in the same change.
+#   Blank lines: a blank line opens types; MARK and import spacing is free-form.
+--disable blankLinesAtStartOfScope,blankLinesBetweenScopes,blankLinesAroundMark,blankLinesBetweenImports
+#   Wrapping: short bodies stay on one line; arguments wrap where they read best.
+--disable wrapFunctionBodies,wrapPropertyBodies,wrapIfStatementBodies,wrapIfExpressionBodies,wrapLoopBodies,wrapArguments,wrapMultilineStatementBraces
+#   Swift Testing: tests keep @Test("description") names, not raw identifiers.
+--disable swiftTestingTestCaseNames
+#   Expressions and declarations written as the author chose.
+--disable redundantReturn,redundantSelf,hoistPatternLet,hoistTry,hoistAwait,conditionalAssignment,opaqueGenericParameters,repeatedGuard,extensionAccessControl
+#   Spacing: aligned comments and operators are allowed; trailing commas optional.
+--disable consecutiveSpaces,spaceAroundOperators,trailingCommas

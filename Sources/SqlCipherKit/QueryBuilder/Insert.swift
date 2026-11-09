@@ -84,7 +84,7 @@ public struct Insert: Sendable {
     /// Array-based build (used internally and by ``Database``).
     public func build(params: [ParamBinding] = []) -> BuiltQuery {
         var ctx = RenderContext()
-        let cols = assignments.map { $0.column.name }.joined(separator: ", ")
+        let cols = assignments.map(\.column.name).joined(separator: ", ")
         let vals = assignments.map { ctx.render($0.value) }.joined(separator: ", ")
         let conflict = onConflict.map { " \($0.rawValue)" } ?? ""
         let sql = "INSERT\(conflict) INTO \(table.name) (\(cols)) VALUES (\(vals))"

@@ -290,8 +290,8 @@ public struct Select: Sendable {
         if !orderClauses.isEmpty {
             let orderSQL =
                 orderClauses
-                .map { "\($0.column.sqlName) \($0.direction.sql)" }
-                .joined(separator: ", ")
+                    .map { "\($0.column.sqlName) \($0.direction.sql)" }
+                    .joined(separator: ", ")
             parts.append("ORDER BY \(orderSQL)")
         }
 

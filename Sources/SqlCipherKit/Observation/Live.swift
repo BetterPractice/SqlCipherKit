@@ -1,6 +1,6 @@
 #if canImport(SwiftUI)
-import SwiftUI
 import os
+import SwiftUI
 
 // MARK: - Environment
 
@@ -207,7 +207,7 @@ final class LiveBox<Result: Sendable>: ObservableObject {
     /// The latest value, if it came from `database`.
     func value(for database: Database?) -> Result? {
         guard let database, let delivered,
-            delivered.database == ObjectIdentifier(database)
+              delivered.database == ObjectIdentifier(database)
         else { return nil }
         return delivered.value
     }

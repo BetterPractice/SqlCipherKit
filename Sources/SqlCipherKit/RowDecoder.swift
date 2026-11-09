@@ -234,8 +234,7 @@ private struct _KeyedContainer<Key: CodingKey>: KeyedDecodingContainerProtocol {
     // MARK: Nested / super
 
     func nestedContainer<NK: CodingKey>(keyedBy type: NK.Type, forKey key: Key) throws
-        -> KeyedDecodingContainer<NK>
-    {
+        -> KeyedDecodingContainer<NK> {
         KeyedDecodingContainer(
             _KeyedContainer<NK>(
                 row: row, codingPath: codingPath + [key], dateStrategy: dateStrategy,
@@ -288,7 +287,7 @@ private struct _KeyedContainer<Key: CodingKey>: KeyedDecodingContainerProtocol {
             .init(
                 codingPath: codingPath + [key],
                 debugDescription:
-                    "Expected \(expected) for column '\(key.stringValue)', got \(got)."))
+                "Expected \(expected) for column '\(key.stringValue)', got \(got)."))
     }
 
     private func decodeDate(from value: Value, key: Key) throws -> Date {
@@ -410,7 +409,7 @@ private struct _SingleValueContainer: SingleValueDecodingContainer {
                 .init(
                     codingPath: codingPath,
                     debugDescription:
-                        "Column value is NULL; use Optional<T> to handle NULL columns."))
+                    "Column value is NULL; use Optional<T> to handle NULL columns."))
         }
         return v
     }
@@ -424,8 +423,8 @@ private struct _SingleValueContainer: SingleValueDecodingContainer {
     }
 }
 
-// Thin Decoder wrapper used only to call Date(from:) / T(from:)
-// via a SingleValueDecodingContainer.
+/// Thin Decoder wrapper used only to call Date(from:) / T(from:)
+/// via a SingleValueDecodingContainer.
 private struct _SingleValueDecoder: Decoder {
     let container: _SingleValueContainer
     var codingPath: [CodingKey] { container.codingPath }

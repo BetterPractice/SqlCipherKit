@@ -293,7 +293,7 @@ public struct Connection: ~Copyable {
         let rc = sqlite3_step(stmt.pointer)
         if rc == SQLITE_SCHEMA, stmt.isCached { cache.evict(sql) }
         // SQLITE_DONE means no rows; any other non-ROW code is an error.
-        if rc != SQLITE_ROW && rc != SQLITE_DONE {
+        if rc != SQLITE_ROW, rc != SQLITE_DONE {
             throw SqlCipherError.stepFailed(message: String(cString: sqlite3_errmsg(db)))
         }
         guard rc == SQLITE_ROW else { return nil }
@@ -353,7 +353,7 @@ extension Connection {
         try bindNamed(stmt.pointer, query.bindings)
         let rc = sqlite3_step(stmt.pointer)
         if rc == SQLITE_SCHEMA, stmt.isCached { cache.evict(query.sql) }
-        if rc != SQLITE_ROW && rc != SQLITE_DONE {
+        if rc != SQLITE_ROW, rc != SQLITE_DONE {
             throw SqlCipherError.stepFailed(message: String(cString: sqlite3_errmsg(db)))
         }
         guard rc == SQLITE_ROW else { return nil }

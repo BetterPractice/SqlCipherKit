@@ -16,4 +16,4 @@
 - [ ] `CHANGELOG.md` updated under `[Unreleased]`
 - [ ] Documentation comments (`///`) updated for any changed public API
 - [ ] `swift test` passes locally
-- [ ] `swiftlint lint` + `swiftformat --lint .` pass locally
+- [ ] `swiftformat --lint .` passes locally

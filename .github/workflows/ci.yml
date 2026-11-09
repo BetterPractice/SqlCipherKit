@@ -19,18 +19,27 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    env:
+      # Keep in step with the version contributors run locally.
+      SWIFTFORMAT_VERSION: "0.64.6"
     steps:
       - uses: actions/checkout@v6
 
-      - name: SwiftFormat
-        uses: nicklockwood/SwiftFormat@0.61.0
-        with:
-          args: --lint
+      # The official release binary is statically linked, so no Swift
+      # toolchain is needed.
+      - name: Install SwiftFormat ${{ env.SWIFTFORMAT_VERSION }}
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/swiftformat.zip" \
+            "https://github.com/nicklockwood/SwiftFormat/releases/download/${SWIFTFORMAT_VERSION}/swiftformat_linux.zip"
+          unzip -q "$RUNNER_TEMP/swiftformat.zip" -d "$RUNNER_TEMP/swiftformat"
+          mv "$RUNNER_TEMP/swiftformat/swiftformat_linux" "$RUNNER_TEMP/swiftformat/swiftformat"
+          chmod +x "$RUNNER_TEMP/swiftformat/swiftformat"
+          echo "$RUNNER_TEMP/swiftformat" >> "$GITHUB_PATH"
 
-      - name: SwiftLint
-        uses: norio-nomura/action-swiftlint@3.2.1
-        with:
-          args: --strict
+      - name: SwiftFormat
+        run: |
+          swiftformat --version
+          swiftformat --lint .
 
   # ── macOS ──────────────────────────────────────────────────────────────────
   test-macos:

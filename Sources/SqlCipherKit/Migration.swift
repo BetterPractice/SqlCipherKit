@@ -15,9 +15,9 @@ public final class MigrationContext: Sendable {
     // MARK: - Storage
 
     /// The raw `sqlite3 *` handle, owned by the surrounding `Database`.
-    nonisolated(unsafe) private let _db: OpaquePointer
+    private nonisolated(unsafe) let _db: OpaquePointer
     /// Shared statement cache, owned by the surrounding `Database`.
-    nonisolated(unsafe) private let _cache: StatementCache
+    private nonisolated(unsafe) let _cache: StatementCache
 
     // MARK: - Init (internal)
 

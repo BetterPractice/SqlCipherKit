@@ -86,7 +86,7 @@ struct LiveBoxTests {
 
     @available(iOS 14.0, macOS 11.0, *)
     @Test("A missing database is reported as a failure")
-    func missingDatabase() async throws {
+    func missingDatabase() {
         let box = LiveBox<[Item]>()
         box.configure(database: nil, request: allItems, animation: nil)
         #expect(box.value(for: nil) == nil)

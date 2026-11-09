@@ -147,12 +147,12 @@ private struct _KeyedContainer<Key: CodingKey>: KeyedEncodingContainerProtocol {
         storage.append(key: key.stringValue, value: .null)
     }
 
-    /// Override: the default `encodeIfPresent` overloads silently drop `nil`
-    /// values (JSON convention — absent key ≡ nil).  For SQL we always want an
-    /// explicit `.null` in the column list.
-    ///
-    /// We must override BOTH the generic and every primitive-typed variant
-    /// because the Codable synthesiser calls the most specific overload.
+    // Override: the default `encodeIfPresent` overloads silently drop `nil`
+    // values (JSON convention — absent key ≡ nil).  For SQL we always want an
+    // explicit `.null` in the column list.
+    //
+    // We must override BOTH the generic and every primitive-typed variant
+    // because the Codable synthesiser calls the most specific overload.
 
     mutating func encodeIfPresent(_ value: Bool?, forKey key: Key) throws {
         if let v = value { try encode(v, forKey: key) } else { try encodeNil(forKey: key) }
@@ -288,7 +288,7 @@ private struct _KeyedContainer<Key: CodingKey>: KeyedEncodingContainerProtocol {
             .init(
                 codingPath: codingPath + [key],
                 debugDescription:
-                    "RowEncoder cannot encode \(T.self) as a scalar SQL value. "
+                "RowEncoder cannot encode \(T.self) as a scalar SQL value. "
                     + "Set complexColumnStrategy on the Database to handle complex types."))
     }
 
@@ -390,7 +390,7 @@ private struct _SingleValueContainer: SingleValueEncodingContainer {
             .init(
                 codingPath: codingPath,
                 debugDescription:
-                    "RowEncoder cannot encode \(T.self) as a scalar SQL value. "
+                "RowEncoder cannot encode \(T.self) as a scalar SQL value. "
                     + "Set complexColumnStrategy on the Database to handle complex types."))
     }
 }
@@ -472,7 +472,7 @@ private struct _CaptureContainer: SingleValueEncodingContainer {
 
 private struct _ThrowingUnkeyedContainer: UnkeyedEncodingContainer {
     let codingPath: [CodingKey]
-    var count: Int = 0
+    var count = 0
 
     mutating func encodeNil() throws { throw _unsupported(codingPath) }
     mutating func encode(_ v: Bool) throws { throw _unsupported(codingPath) }

@@ -92,7 +92,7 @@ final class ChangeTracker {
     /// Authorizer callback body.  Statements prepared outside ``compile(_:)``
     /// (opening checks, SQLite's automatic re-prepare after a schema change)
     /// are ignored; a re-prepared statement keeps its original write set.
-    fileprivate func authorize(
+    private func authorize(
         _ action: Int32,
         _ arg1: UnsafePointer<CChar>?,
         _ arg2: UnsafePointer<CChar>?
@@ -102,7 +102,7 @@ final class ChangeTracker {
         case SQLITE_INSERT, SQLITE_UPDATE, SQLITE_DELETE:
             if let name = Self.userTable(arg1) { compiling!.rowTables.insert(name) }
         case SQLITE_CREATE_TABLE, SQLITE_CREATE_TEMP_TABLE,
-            SQLITE_DROP_TABLE, SQLITE_DROP_TEMP_TABLE:
+             SQLITE_DROP_TABLE, SQLITE_DROP_TEMP_TABLE:
             if let name = Self.userTable(arg1) { compiling!.schemaTables.insert(name) }
         case SQLITE_ALTER_TABLE:
             // arg1 is the schema name, arg2 the table.

@@ -233,8 +233,8 @@ extension Connection {
         } else {
             let setClause =
                 updateCols
-                .map { "\"\($0.key)\" = excluded.\"\($0.key)\"" }
-                .joined(separator: ",\n    ")
+                    .map { "\"\($0.key)\" = excluded.\"\($0.key)\"" }
+                    .joined(separator: ",\n    ")
             sql = """
                 INSERT INTO "\(T.tableName.name)" (\(colList))
                 VALUES (\(placeholders))
