@@ -53,11 +53,17 @@ jobs:
       - name: Build and test
         run: swift test --configuration debug --enable-code-coverage
 
+      # Paths come from SwiftPM: the test bundle's name and the build
+      # directory layout differ between toolchains (Swift 6.4 names the
+      # bundle after the test target and builds under .build/out).
       - name: Coverage report
         run: |
+          BIN_DIR="$(swift build --show-bin-path)"
+          BUNDLE="$(find "$BIN_DIR" -maxdepth 1 -name '*.xctest' | head -n 1)"
+          PROFDATA="$(dirname "$(swift test --show-codecov-path)")/default.profdata"
           xcrun llvm-cov report \
-            .build/debug/SqlCipherKitPackageTests.xctest/Contents/MacOS/SqlCipherKitPackageTests \
-            -instr-profile .build/debug/codecov/default.profdata \
+            "$BUNDLE/Contents/MacOS/$(basename "$BUNDLE" .xctest)" \
+            -instr-profile "$PROFDATA" \
             --ignore-filename-regex=".build|CSqlCipher" \
             --summary-only
 
@@ -90,10 +96,14 @@ jobs:
       - name: Build and test
         run: swift test --configuration debug --enable-code-coverage
 
+      # See the macOS coverage step.  On Linux the bundle is the executable.
       - name: Coverage report
         run: |
+          BIN_DIR="$(swift build --show-bin-path)"
+          BUNDLE="$(find "$BIN_DIR" -maxdepth 1 -name '*.xctest' | head -n 1)"
+          PROFDATA="$(dirname "$(swift test --show-codecov-path)")/default.profdata"
           llvm-cov report \
-            .build/debug/SqlCipherKitPackageTests.xctest \
-            -instr-profile .build/debug/codecov/default.profdata \
+            "$BUNDLE" \
+            -instr-profile "$PROFDATA" \
             --ignore-filename-regex=".build|CSqlCipher" \
             --summary-only
