@@ -77,6 +77,20 @@ jobs:
             --ignore-filename-regex=".build|CSqlCipher" \
             --summary-only
 
+      # Runners on the same image do not always have the iOS platform installed
+      # for older, non-default Xcode versions; xcodebuild then lists the iOS
+      # destination with "error:iOS <version> is not installed".  Download it
+      # only in that case, so provisioned runners pay nothing.
+      - name: Ensure the iOS platform is installed
+        run: |
+          if xcodebuild -showdestinations -scheme SqlCipherKit 2>/dev/null \
+              | grep "platform:iOS," | grep -q "error:"; then
+            echo "iOS platform missing for Xcode ${{ matrix.xcode }}; downloading"
+            xcodebuild -downloadPlatform iOS -architectureVariant arm64
+          else
+            echo "iOS platform already installed"
+          fi
+
       # pipefail makes the step fail when xcodebuild does, not just xcpretty.
       - name: Build for iOS (deployment target check)
         run: |
