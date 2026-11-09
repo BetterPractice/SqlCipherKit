@@ -27,7 +27,7 @@ Add the dependency to your `Package.swift`:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/BetterPractice/SqlCipherKit.git", from: "0.10.0"),
+    .package(url: "https://github.com/BetterPractice/SqlCipherKit.git", from: "0.11.0"),
 ],
 targets: [
     .target(

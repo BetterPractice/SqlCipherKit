@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-11-08
+
 ### Added
 - Live queries. A `LiveRequest` describes an entity fetch (`.fetch`, `.fetchOne`) or a scalar aggregate (`.count`, `.exists`, `.sum`, `.min`, `.max`, `.avg`, `.total`) to observe. Requests with the same SQL and bindings are equal.
 - `Database.values(of:)`: an `AsyncSequence` that yields a request's current value and then each change. It is pull-based, skips changes that leave the result the same, and works on Linux.
