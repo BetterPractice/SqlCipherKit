@@ -100,8 +100,8 @@ extension LiveRequest {
         if let predicate { select = select.where(predicate) }
         for term in ordering { select = select.orderBy(term.column, term.direction) }
         if let limit { select = select.limit(limit) }
-        return LiveRequest(query: select.build(), table: T.tableName, placeholder: []) {
-            rows, strategy in
+        let query = select.build()
+        return LiveRequest(query: query, table: T.tableName, placeholder: []) { rows, strategy in
             try decodeEntities(T.self, rows, strategy)
         }
     }
@@ -115,8 +115,8 @@ extension LiveRequest {
         let select = Select(.all).from(T.tableName)
             .where(.compare(ColumnRef(T.primaryKeyName), .eq, .literal(id)))
             .limit(1)
-        return LiveRequest(query: select.build(), table: T.tableName, placeholder: nil) {
-            rows, strategy in
+        let query = select.build()
+        return LiveRequest(query: query, table: T.tableName, placeholder: nil) { rows, strategy in
             try decodeEntities(T.self, rows, strategy).first
         }
     }
